@@ -16,8 +16,8 @@ module.exports = class MessageDeliveryService {
         for(let i in messages){
           const message = messages[i];
           try{
-            await emailClient.sendMessage(message.from, message.to, message.subject, message.body);
-            await messageDB.setEmailSent(message.emailId);
+            const result = await emailClient.sendMessage(message);
+            await messageDB.saveEmailSendResult(result);
           } catch(err){
             //need to add logger
             console.log(err);
@@ -33,14 +33,26 @@ module.exports = class MessageDeliveryService {
 
     while(continueSending){
       let messages = await messageDB.getPushNotificationsToSend();
-
       if(messages.length === 0){
         continueSending = false;
       } else {
-        let responses = await pushNotificationClient.sendMessages(messages);
-        console.log(responses);
+        try{
+          let results = await pushNotificationClient.sendMessages(messages);
+          await processPushNotificationSendResults(results);
+        } catch(err){
+          console.log(err);
+        }
       }
     }
   }
 }
 
+const processPushNotificationSendResults = async(results) => {
+  for(let result in results){
+    try {
+      await messageDB.savePushNotificationSendResult(results[result]);
+    } catch (err){
+      console.log(err);
+    }
+  }
+}

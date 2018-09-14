@@ -8,8 +8,8 @@ module.exports = class WelcomeEmail extends EmailTemplate {
    * @param {Object} messageParameters
    * @returns {void}
    */
-  static validateMessage(messageParameters){
-    super.validateMessage(messageParameters);
+  static validateMessageParameters(messageParameters){
+    super.validateMessageParameters(messageParameters);
     if (!('firstName' in messageParameters))
     {
       throw Error('firstName is a required message param when sending the Welcome Email.');

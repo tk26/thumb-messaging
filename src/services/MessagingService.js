@@ -1,4 +1,5 @@
-const { WelcomeEmail } = require('../templates');
+const { WelcomeEmail } = require('../templates/email-templates');
+const { NewFollower } = require('../templates/push-templates');
 const { MessageTypes, Email, PushNotification } = require('../domain');
 
 module.exports = class MessagingService {
@@ -17,7 +18,7 @@ module.exports = class MessagingService {
       default:
         return null;
     }
-    template.validateMessage(messageParameters);
+    template.validateMessageParameters(messageParameters);
     return template.createEmail(messageParameters);
   }
 
@@ -27,6 +28,16 @@ module.exports = class MessagingService {
    * @returns {PushNotification}
    */
   static createPushNotification(messageType, messageParameters){
-    return new PushNotification();
+    const { NEW_FOLLOWER } = MessageTypes;
+    let template;
+    switch (messageType){
+      case NEW_FOLLOWER:
+        template = NewFollower;
+        break;
+      default:
+        return null;
+    }
+    template.validateMessageParameters(messageParameters);
+    return template.createPushNotification(messageParameters);
   }
 }

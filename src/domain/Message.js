@@ -2,7 +2,6 @@ let uuid = require('uuid/v1');
 const MessagingService = require('../services/MessagingService.js');
 const messageDB = require('../db/message-db.js');
 
-
 module.exports = class Message{
   constructor({ messageId = uuid(), toUserId, messageType, messageParameters, createdDate = new Date() }){
     this.messageId = messageId;
@@ -23,7 +22,7 @@ module.exports = class Message{
     this.deliveryMethods.push(notification);
   }
 
-  save(){
-    messageDB.saveMessage(this);
+  async save(){
+    await messageDB.saveMessage(this);
   }
 }

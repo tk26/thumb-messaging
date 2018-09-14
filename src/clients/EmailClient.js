@@ -7,14 +7,29 @@ module.exports = class EmailClient{
     this.setMailer();
   }
 
-  async sendMessage(from, to, subject, body){
+  async sendMessage(message){
     let mailOptions = {
-      from: from,
-      to: to,
-      subject: subject,
-      html: body
+      from: message.from,
+      to: message.to,
+      subject: message.subject,
+      html: message.body
     };
-    await this.mailer.sendMail(mailOptions);
+    let error = '';
+    let status;
+    try{
+      await this.mailer.sendMail(mailOptions);
+      status = 'ok';
+    } catch (err){
+      error = err;
+      status = 'error';
+    }
+    return {
+      message: message,
+      response: {
+        status,
+        error
+      }
+    }
   }
 
   setMailer(){

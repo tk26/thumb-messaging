@@ -7,19 +7,17 @@ module.exports = class PushNotificationClient{
   async sendMessages(messages){
     const convertedMessages = convertMessagesForExpo(messages);
     let chunks = this.expo.chunkPushNotifications(convertedMessages);
-    let tickets = [];
+    let responses = [];
     // Send the chunks to the Expo push notification service.
     for (let chunk of chunks) {
       try {
-        console.log(chunk);
-        let ticketChunk = await this.expo.sendPushNotificationsAsync(chunk);
-        console.log(ticketChunk);
-        tickets.push(...ticketChunk);
+        let responseChunk = await this.expo.sendPushNotificationsAsync(chunk);
+        responses.push(...createResponses(chunk,responseChunk));
       } catch (error) {
         console.error(error);
       }
     }
-    return tickets;
+    return responses;
   }
 }
 
@@ -32,15 +30,44 @@ const convertMessagesForExpo = (messages) => {
       continue;
     }
 
-    // Construct a message (see https://docs.expo.io/versions/latest/guides/push-notifications.html)
-    convertedMessages.push({
+    let data = JSON.parse(message.data);
+    let convertedMessage = {
       pushNotificationId: message.pushNotificationId,
       to: message.pushToken,
       sound: message.sound,
       body: message.body,
-      data: message.data
-    });
+      data: data
+    };
+
+    //conditionally add title
+    if (message.title && message.title !== ''){
+      convertedMessage.title = message.title;
+    }
+
+    // Construct a message (see https://docs.expo.io/versions/latest/guides/push-notifications.html)
+    convertedMessages.push(convertedMessage);
   }
 
   return convertedMessages;
+}
+
+const createResponses = (messages, rawResponses) => {
+  let responses = [];
+  for(let i in rawResponses){
+    let errorMessage = '', errorType = '';
+    if(rawResponses[i].status === 'error'){
+      errorMessage = rawResponses[i].message;
+      errorType = rawResponses[i].details.error ? rawResponses[i].details.error : '';
+    }
+    let response = {
+      message: messages[i],
+      response: {
+        status: rawResponses[i].status,
+        error: errorMessage,
+        errorType: errorType
+      }
+    }
+    responses.push(response);
+  }
+  return responses;
 }

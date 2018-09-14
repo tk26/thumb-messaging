@@ -1,5 +1,5 @@
 module.exports = class EmailTemplate{
-  static validateMessage(messageParameters){
+  static validateMessageParameters(messageParameters){
     if(!messageParameters){
       throw Error('The message is missing message parameters.');
     }

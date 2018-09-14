@@ -42,7 +42,7 @@ exports.saveMessage = async function(message){
 
 exports.deleteMessage = async function(messageId){
   let query = 'MATCH (m:Message{messageId:{messageId}})' + endOfLine;
-  query += 'DETACH DELETE m';
+  query += 'WITH (m) OPTIONAL MATCH (m)-[:DELIVERY_METHOD]->(n) DETACH DELETE m, n' + endOfLine;
   try {
     return await neo4j.execute(query,{messageId: messageId});
   } catch (err){
@@ -72,7 +72,7 @@ const savePushNotificationDeliveryMethod = async function(messageId, pushNotific
   let query = 'WITH datetime($scheduledDeliveryTime) AS deliveryTime' + endOfLine;
   query += 'MATCH(m:Message{messageId:{messageId}})' + endOfLine;
   query += 'MERGE (m)-[:DELIVERY_METHOD]->(pn:PushNotification{pushNotificationId: {pushNotificationId}, scheduledDeliveryTime: deliveryTime, ';
-  query += 'pushToken: {pushToken}, sound: {sound}, body: {body}, data: {data}})';
+  query += 'pushToken: {pushToken}, sound: {sound}, title: {title}, body: {body}, data: {data}})';
 
   await neo4j.execute(query,
     {
@@ -81,8 +81,9 @@ const savePushNotificationDeliveryMethod = async function(messageId, pushNotific
       scheduledDeliveryTime: pushNotification.scheduledDeliveryTime.toISOString(),
       pushToken: pushNotification.pushToken,
       sound: pushNotification.sound,
+      title: pushNotification.title === undefined ? '' : pushNotification.title,
       body: pushNotification.body,
-      data: pushNotification.data
+      data: JSON.stringify(pushNotification.data)
     }
   );
 }
@@ -106,7 +107,7 @@ exports.getEmailsToSend = async function(){
 exports.getPushNotificationsToSend = async function(){
   let query = "WITH datetime() AS now" + endOfLine;
   query += "MATCH(pn:PushNotification) WHERE pn.deliveredOn IS NULL AND pn.scheduledDeliveryTime <= now" + endOfLine;
-  query += "RETURN pn.pushNotificationId, pn.pushToken, pn.sound, pn.body, pn.data ORDER BY pn.scheduledDeliveryTime LIMIT 1000";
+  query += "RETURN pn.pushNotificationId, pn.pushToken, pn.sound, pn.title, pn.body, pn.data ORDER BY pn.scheduledDeliveryTime LIMIT 1000";
 
   try {
     //get messages
@@ -119,30 +120,34 @@ exports.getPushNotificationsToSend = async function(){
   }
 }
 
-exports.setEmailSent = async function(emailId){
-  let query = "MATCH(e:Email{emailId: {emailId}})" + endOfLine;
-  query += "SET e.deliveredOn = {deliveredOn}";
+exports.saveEmailSendResult = async function(result){
+  let query = "WITH datetime() AS now" + endOfLine;
+  query += "MATCH(e:Email{emailId: {emailId}})" + endOfLine;
+  query += "SET e.deliveredOn = now, e.sendStatus = {sendStatus}, e.error = {error}";
 
   try {
-    //get messages
     return await neo4j.execute(query,{
-      emailId: emailId,
-      deliveredOn: new Date().toISOString()
+      emailId: result.message.emailId,
+      sendStatus: result.response.status,
+      error: result.response.error
     });
   } catch(error){
     throw error;
   }
 }
 
-exports.setPushNotificationSent = async function(pushNotificationId){
+exports.savePushNotificationSendResult = async function(result){
   let query = "WITH datetime() AS now" + endOfLine;
   query += "MATCH(pn:PushNotification{pushNotificationId: {pushNotificationId}})" + endOfLine;
-  query += "SET pn.deliveredOn = now";
+  query += "SET pn.deliveredOn = now, pn.sendStatus = {sendStatus}, pn.error = {error}, pn.errorType = {errorType}";
 
   try {
     //get messages
     return await neo4j.execute(query,{
-      pushNotificationId: pushNotificationId
+      pushNotificationId: result.message.pushNotificationId,
+      sendStatus: result.response.status,
+      error: result.response.error,
+      errorType: result.response.errorType
     });
   } catch(error){
     throw error;

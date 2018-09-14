@@ -19,4 +19,15 @@ describe('MessagingService', () => {
       email.body.should.not.equal(undefined);
     });
   });
+  describe('createPushNotification', () => {
+    it('should return new follower push notification when provided correct type and params',() => {
+      const messageParameters = {
+        pushToken: 'ExponentPushToken[sadfasdf]',
+        username: 'testuser'
+      };
+      const pushNotification = MessagingService.createPushNotification(MessageTypes.NEW_FOLLOWER, messageParameters);
+      pushNotification.pushToken.should.equal(messageParameters.pushToken);
+      pushNotification.body.should.equal(messageParameters.username + ' started following you.')
+    });
+  });
 });
