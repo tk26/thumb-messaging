@@ -28,7 +28,7 @@ describe('MessageDeliveryService', () => {
       saveResultStub.restore();
     });
   });
-  describe.only('processPushNotifications', () => {
+  describe('processPushNotifications', () => {
     it('should send push notifications and mark as sent when a push notification is unsent',async() => {
       const messageDB = require('../../src/db/message-db.js');
       const newFollowerPushNotification = MessagingService.createPushNotification(NEW_FOLLOWER, {pushToken: 'ExponentPushToken[D7NYfBPGyyRIx2H0IQ6BDK]', username:'test_username'});
