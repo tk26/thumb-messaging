@@ -54,10 +54,9 @@ module.exports = class EmailClient{
                 user: config.ETHEREAL_CREDENTIALS.user,
                 pass: config.ETHEREAL_CREDENTIALS.password
             },
-            logger: true,
-            debug: true
+            logger: false,
+            debug: false
         };
-        console.log(mailConfig);
         mailer = nodemailer.createTransport(mailConfig);
     }
     this.mailer = mailer;

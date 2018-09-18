@@ -7,7 +7,8 @@
     "build": "npm-run-all --parallel lint",
     "lint": "esw src test --color",
     "test": "cross-env NODE_ENV=test npm run checkcoverage",
-    "test-debug": "cross-env NODE_ENV=test mocha --recursive test --exit",
+    "test-unit": "cross-env NODE_ENV=test mocha test/unit --recursive --exit",
+    "test-integration": "cross-env NODE_ENV=test mocha test/integration --recursive --exit",
     "checkcoverage": "nyc --check-coverage --lines 80 --functions 80 --branches 70 --reporter=text mocha --exit"
   },
   "repository": {
@@ -45,5 +46,11 @@
     "nyc": "^11.4.1",
     "sinon": "^4.5.0",
     "sinon-chai": "^3.0.0"
+  },
+  "nyc": {
+    "exclude": [
+      "config.js",
+      "src/drivers/"
+    ]
   }
 }

@@ -1,5 +1,8 @@
+const {NEW_FOLLOWER} = require('../../domain/MessageTypes');
 const NewFollower = require('./NewFollower');
 
-module.exports = {
-  NewFollower: NewFollower
-}
+let templates = {};
+
+templates[NEW_FOLLOWER] = NewFollower;
+
+module.exports = templates;

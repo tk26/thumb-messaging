@@ -1,43 +1,31 @@
-const { WelcomeEmail } = require('../templates/email-templates');
-const { NewFollower } = require('../templates/push-templates');
-const { MessageTypes, Email, PushNotification } = require('../domain');
+const emailTemplates = require('../templates/email-templates');
+const pushTemplates = require('../templates/push-templates');
+const { Email, PushNotification } = require('../domain');
 
-module.exports = class MessagingService {
-  /**
-   * @param {String} messageType
-   * @param {Object} messageParameters
-   * @returns {Email}
-   */
-  static createEmail(messageType, messageParameters){
-    const { WELCOME_EMAIL } = MessageTypes;
-    let template;
-    switch (messageType){
-      case WELCOME_EMAIL:
-        template = WelcomeEmail;
-        break;
-      default:
-        return null;
-    }
-    template.validateMessageParameters(messageParameters);
-    return template.createEmail(messageParameters);
+/**
+ * @param {String} messageType
+ * @param {Object} messageParameters
+ * @returns {Email}
+ */
+exports.createEmail = (messageType, messageParameters) => {
+  if((!(messageType in emailTemplates))){
+    throw new TypeError("An email template was not found for " + messageType);
   }
+  let template = emailTemplates[messageType];
+  template.validateMessageParameters(messageParameters);
+  return template.createEmail(messageParameters);
+}
 
-  /**
-   * @param {String} messageType
-   * @param {Object} messageParameters
-   * @returns {PushNotification}
-   */
-  static createPushNotification(messageType, messageParameters){
-    const { NEW_FOLLOWER } = MessageTypes;
-    let template;
-    switch (messageType){
-      case NEW_FOLLOWER:
-        template = NewFollower;
-        break;
-      default:
-        return null;
-    }
-    template.validateMessageParameters(messageParameters);
-    return template.createPushNotification(messageParameters);
+/**
+ * @param {String} messageType
+ * @param {Object} messageParameters
+ * @returns {PushNotification}
+ */
+exports.createPushNotification = (messageType, messageParameters) => {
+  if((!(messageType in pushTemplates))){
+    throw new TypeError("A push template was not found for " + messageType);
   }
+  let template = pushTemplates[messageType];
+  template.validateMessageParameters(messageParameters);
+  return template.createPushNotification(messageParameters);
 }

@@ -2,12 +2,12 @@ const chai = require('chai');
 const should = chai.should();
 const moment = require('moment');
 
-const messageDB = require('../../src/db/message-db.js');
-const Message = require('../../src/domain/Message.js');
-const Email = require('../../src/domain/delivery_methods/Email');
-const PushNotification = require('../../src/domain/delivery_methods/PushNotification');
+const messageDB = require('../../../src/db/message-db.js');
+const Message = require('../../../src/domain/Message.js');
+const Email = require('../../../src/domain/delivery_methods/Email');
+const PushNotification = require('../../../src/domain/delivery_methods/PushNotification');
 const uuid = require('uuid/v1');
-const neo4j = require('../../src/drivers/neo4jDriver.js');
+const neo4j = require('../../../src/drivers/neo4jDriver.js');
 
 const fakeUserId = uuid();
 

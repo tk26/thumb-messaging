@@ -5,9 +5,9 @@ module.exports = class PushNotificationClient{
     this.expo = new Expo();
   }
   async sendMessages(messages){
-    const convertedMessages = convertMessagesForExpo(messages);
-    let chunks = this.expo.chunkPushNotifications(convertedMessages);
     let responses = [];
+    const convertedResult = convertMessagesForExpo(messages);
+    let chunks = this.expo.chunkPushNotifications(convertedResult.convertedMessages);
     // Send the chunks to the Expo push notification service.
     for (let chunk of chunks) {
       try {
@@ -17,16 +17,25 @@ module.exports = class PushNotificationClient{
         console.error(error);
       }
     }
+    responses.push(...convertedResult.failedMessages);
     return responses;
   }
 }
 
 const convertMessagesForExpo = (messages) => {
   let convertedMessages = [];
+  let failedMessages = [];
   for (let message of messages) {
     // Check that all your push tokens appear to be valid Expo push tokens
     if (!Expo.isExpoPushToken(message.pushToken)) {
-      console.error(`Push token ${message.pushToken} is not a valid Expo push token`);
+      failedMessages.push({
+        message: message,
+        response: {
+          status: 'error',
+          error: `Push token ${message.pushToken} is not a valid Expo push token`,
+          errorType: 'Invalid Push Token'
+        }
+      })
       continue;
     }
 
@@ -48,7 +57,10 @@ const convertMessagesForExpo = (messages) => {
     convertedMessages.push(convertedMessage);
   }
 
-  return convertedMessages;
+  return {
+    convertedMessages,
+    failedMessages
+  };
 }
 
 const createResponses = (messages, rawResponses) => {
