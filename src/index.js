@@ -1,6 +1,6 @@
-const MessagingService = require('./src/services/MessagingService');
+const MessagingService = require('./services/MessagingService');
 const MessageDeliveryService = require('./services/MessageDeliveryService');
-const Message = require('./src/domain/Message');
+const Message = require('./domain/Message');
 const MessageTypes = require('./domain/MessageTypes');
 
 module.exports = {
