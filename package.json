@@ -9,7 +9,7 @@
     "test": "cross-env NODE_ENV=test npm run checkcoverage",
     "test-unit": "cross-env NODE_ENV=test mocha test/unit --recursive --exit",
     "test-integration": "cross-env NODE_ENV=test mocha test/integration --recursive --exit",
-    "checkcoverage": "nyc --check-coverage --lines 80 --functions 80 --branches 70 --reporter=text mocha --exit"
+    "checkcoverage": "nyc --check-coverage --lines 80 --functions 80 --branches 70 --reporter=text mocha test --recursive --exit"
   },
   "repository": {
     "type": "git",
@@ -25,11 +25,12 @@
     "@sendgrid/mail": "^6.2.1",
     "expo-server-sdk": "^3.0.1",
     "moment": "^2.22.2",
+    "neo4j-driver": "^1.6.3",
     "nodemailer": "^4.6.3",
     "nodemailer-sendgrid-transport": "^0.2.0",
     "os": "^0.1.1",
-    "uuid": "^3.3.2",
-    "neo4j-driver": "^1.6.3"
+    "thumb-logger": "git+https://jdromine:6af3f3b09e490af5b770edf44e21faf997f4738a@github.com/tk26/thumb-logger.git#master",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "chai": "^4.1.2",

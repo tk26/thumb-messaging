@@ -1,20 +1,27 @@
 const { Expo } = require('expo-server-sdk');
+const expo = new Expo();
 
 module.exports = class PushNotificationClient{
-  constructor(){
-    this.expo = new Expo();
-  }
-  async sendMessages(messages){
+  static async sendMessages(messages){
     let responses = [];
     const convertedResult = convertMessagesForExpo(messages);
-    let chunks = this.expo.chunkPushNotifications(convertedResult.convertedMessages);
+    let chunks = expo.chunkPushNotifications(convertedResult.convertedMessages);
     // Send the chunks to the Expo push notification service.
     for (let chunk of chunks) {
       try {
-        let responseChunk = await this.expo.sendPushNotificationsAsync(chunk);
+        let responseChunk = await expo.sendPushNotificationsAsync(chunk);
         responses.push(...createResponses(chunk,responseChunk));
       } catch (error) {
-        console.error(error);
+        for(let i in chunk){
+          responses.push({
+            message: chunk[i],
+            response: {
+              status: 'error',
+              error: error,
+              errorType: 'Internal exception'
+            }
+          });
+        }
       }
     }
     responses.push(...convertedResult.failedMessages);
