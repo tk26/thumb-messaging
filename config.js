@@ -26,6 +26,7 @@ function config(){
             'NEO4J_DATABASE_USER': process.env.NEO4J_DB_USER,
             'NEO4J_DATABASE_PASSWORD': process.env.NEO4J_DB_PASSWORD,
             'SENDGRID_API_KEY': process.env.SENDGRID_API_KEY,
+            'ETHEREAL_CREDENTIALS': {'user': 'xy7acxpl7wtdjd5i@ethereal.email', 'password': 'ecNuxBSHZhnNqsuhtj'},
             'APP_SETTINGS': {
               'WELCOME_EMAIL_MINUTE_DELAY': 1440
             }

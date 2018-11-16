@@ -5,7 +5,8 @@ const config = require('../../config.js');
 const getMailer = () => {
   let mailConfig;
   let mailer;
-  if (process.env.NODE_ENV === 'prod' ){
+  if (process.env.NODE_ENV === 'production' ){
+  //if (process.env.NODE_ENV === 'prod' ){
       // all emails are delivered to destination
       let options = {
         auth: {
